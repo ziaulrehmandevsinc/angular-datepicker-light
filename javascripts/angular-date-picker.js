@@ -178,6 +178,8 @@
         var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
         this.target = null;
+        this.targetText = null;
+
         this.containerVisible = false;
         this.validYears = [];
 
@@ -186,8 +188,7 @@
         this.selectedData = null;
         this.selectedMonth = null;
         this.selectedYear = null;
-        this.targetText = null;
-
+        
         this.dayNames = [];
         this.weeks = [];
 
