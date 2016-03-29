@@ -170,7 +170,7 @@
         var activeInstanceId = 0,
             minDate,
             maxDate,
-            cellDataArray = [];
+            calendarItems = [];
 
         var monthNamesLong = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
         //var monthNamesShort = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -227,9 +227,11 @@
             if (maxDate == null) {
                 maxDate = new Date(now.getFullYear(), 11, 31);
             }
+            
+            // create day names array starting at options.dayOfWeekStart
 
-            // object array of month names.
-            // had to do this because ng-options require an array of objects not strings
+            // create an object array of month names
+            // a simple simple string array will not work with ng-options
             that.monthNames = [];
             for (i = 0; i <= 11; i++) {
                 that.monthNames.push({
@@ -361,7 +363,7 @@
         this.todayDateSelect = function() {
             // if date is not in range, do not select and do not hide
             if (!isDateInRange(that.todayDate)) {
-                retur;
+                return;
             }
             
             // rebuild if the current month or year do not match today
@@ -431,7 +433,7 @@
         }
         
         this.isDateEnabled = function(date) {
-            var cellData = cellDataArray.find(function(cellData){
+            var cellData = calendarItems.find(function(cellData){
                 return areDatesEqual(cellData.date, date);
             });
             
@@ -505,12 +507,15 @@
 
         function buildCalendarIfRequired(date) {
             // rebuild if the current month or year do not match today
-            //if (date.getMonth() !== that.selectedMonth || date.getFullYear() !== that.selectedYear) {
+            if (calendarItems.length === 0
+                || date.getMonth() !== that.selectedMonth 
+                || date.getFullYear() !== that.selectedYear) {
+                
                 that.selectedMonth = date.getMonth();
                 that.selectedYear = date.getFullYear();
 
                 buildCalendar(date);
-            //}
+            }
         }
 
         //build the calendar and select 'dateToSelect' date
@@ -526,29 +531,54 @@
                 datesInWeek = 0,
                 date = 1;
 
-            cellDataArray = [];
+            calendarItems = [];
             that.weeks = [];
 
+            // dayOfWeekStart < firstDayOfMonth
+            // 0   1   2   3   4   5   6
+            // Sun Mon Tue Wed Thu Fri Sat    (1 - firstDayOfMonth)
+            //                         01  => -5 :  
+            //                     01  02  => -4 :
+            //                 01  02  03  => -3 :
+            //             01  02  03  04  => -2 :
+            //         01  02  03  04  05  => -1 :
+            //     01  02  03  04  05  06  =>  0 :
+            // 01  02  03  03  04  05  06  =>  No change firstDayOfMonth === dayOfWeekStart
+            
+            // dayOfWeekStart > firstDayOfMonth
+            // 6   0   1   2   3   4   5
+            // Sat Sun Mon Tue Wed Thu Fri    (-firstDayOfMonth)
+            //                         01  => -5 :  
+            //                     01  02  => -4 :
+            //                 01  02  03  => -3 :
+            //             01  02  03  04  => -2 :
+            //         01  02  03  04  05  => -1 :
+            //     01  02  03  04  05  06  =>  0 :
+            // 01  02  03  03  04  05  06  =>  No change firstDayOfMonth === dayOfWeekStart
+            
             // if first day of month != dayOfWeekStart then start dates from prior month
-            if (firstDayOfMonth != dayOfWeekStart) {
+            if (dayOfWeekStart < firstDayOfMonth) {
                 date = 1 - firstDayOfMonth;
+            }
+            else if (dayOfWeekStart > firstDayOfMonth) {
+                date = -firstDayOfMonth;
             }
 
             while (date <= getDaysInMonth(year, month)) {
-                cellDataArray.push(getCellData(getDate(year, month, date++)));
+                calendarItems.push(getCellData(getDate(year, month, date++)));
             }
 
             // fill remaining cells with dates from next month
-            while ((cellDataArray.length % 7) !== 0) {
-                cellDataArray.push(getCellData(getDate(year, month, date++)));
+            while ((calendarItems.length % 7) !== 0) {
+                calendarItems.push(getCellData(getDate(year, month, date++)));
             }
 
             //raise the callback for each cell data
-            raiseRenderDateCallback(cellDataArray)
+            raiseRenderDateCallback(calendarItems)
 
             // after the renderDate callbacks find the object with cellData.selected == true.
             // this might have been set on the cellData during callback
-            var selectedCellData = cellDataArray.find(function(cellData) {
+            var selectedCellData = calendarItems.find(function(cellData) {
                 // must be enabled to be able to select
                 return cellData.selected === true && cellData.enabled === true;
             });
@@ -558,7 +588,7 @@
             // 2. if cellData exists and the selected property is undefined (not set) set it to selected
             if (angular.isUndefined(selectedCellData)) {
                 if (angular.isDate(dateToSelect)) {
-                    var cellData = cellDataArray.find(function(cellData) {
+                    var cellData = calendarItems.find(function(cellData) {
                         // must be enabled to be able to select
                         return areDatesEqual(cellData.date, dateToSelect) 
                             && cellData.enabled === true;
@@ -572,7 +602,7 @@
             }
 
             // populate the that.weeks array. create a 2D array of 7 days per row
-            angular.forEach(cellDataArray, function(cellData) {
+            angular.forEach(calendarItems, function(cellData) {
                 if ((datesInWeek % 7) === 0) {
                     that.weeks.push([]);
                     rowIndex = that.weeks.length - 1;

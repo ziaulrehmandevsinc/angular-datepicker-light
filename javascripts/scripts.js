@@ -22,7 +22,8 @@
         vm.date = "07/04/2016";
         vm.datePickerOptions = {
             inline: true,
-            containerCssClass: "date-picker-container-inline"
+            containerCssClass: "date-picker-container-inline",
+            dayOfWeekStart: 0
         };
     }
 
