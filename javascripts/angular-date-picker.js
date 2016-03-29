@@ -29,6 +29,9 @@
             // execute the options expression in the parent scope
             var options = ctrl.options() || {};
             ctrl.init(angular.extend({}, defaultOptions, options));
+            
+            // store the jquery element on the controller          
+            ctrl.target = element;
 
             $templateRequest("javascripts/templates/days-view.html")
                 .then(function(template) {
@@ -55,9 +58,6 @@
                     $document.find("body").append(ctrl.container);
                     ctrl.container.addClass("date-picker-absolute-container");
                 }
-
-                // store the jquery element on the controller          
-                ctrl.target = element;
 
                 // prevents text select on mouse drag, dblclick
                 ctrl.container.css("MozUserSelect", "none").bind("selectstart", function() {
@@ -217,9 +217,8 @@
 
             var now = new Date();
 
-            // set min and max date
-            // if not provided in options then default
-            // minDate to 1/1 and maxDate to 12/31 of current year
+            // set min and max date values
+            // if not provided in options default minDate to 1/1 and maxDate to 12/31 of current year
             minDate = parseDate(that.options.minDate);
             if (minDate == null) {
                 minDate = new Date(now.getFullYear(), 0, 1);
@@ -279,7 +278,7 @@
 
             that.applyDateFromTarget();
 
-            buildCalendar();
+            buildCalendar();    
 
             that.show();
         }
@@ -351,11 +350,6 @@
         }
 
         this.dateSelect = function(cellData) {
-//            // do not select if disabled
-//            if (cellData.enabled === false) {
-//                return;
-//            }
-
             // rebuild if the current month or year do not match today
             buildCalendarIfRequired(cellData.date);
 
@@ -366,20 +360,16 @@
 
         this.todayDateSelect = function() {
             // if date is not in range, do not select and do not hide
-            if (isDateInRange(that.todayDate)) {
-                // rebuild if the current month or year do not match today
-                buildCalendarIfRequired(that.todayDate);
-
-                applySelection(getCellData(that.todayDate));
-                
-                that.hide();
+            if (!isDateInRange(that.todayDate)) {
+                retur;
             }
-//            else {
-//                that.selectedMonth = that.todayDate.getMonth();
-//                that.selectedYear = that.todayDate.getFullYear();
-//
-//                buildCalendar();
-//            }
+            
+            // rebuild if the current month or year do not match today
+            buildCalendarIfRequired(that.todayDate);
+
+            applySelection(getCellData(that.todayDate));
+
+            that.hide();
         }
 
 
@@ -515,12 +505,12 @@
 
         function buildCalendarIfRequired(date) {
             // rebuild if the current month or year do not match today
-            if (date.getMonth() !== that.selectedMonth || date.getFullYear() !== that.selectedYear) {
+            //if (date.getMonth() !== that.selectedMonth || date.getFullYear() !== that.selectedYear) {
                 that.selectedMonth = date.getMonth();
                 that.selectedYear = date.getFullYear();
 
                 buildCalendar(date);
-            }
+            //}
         }
 
         //build the calendar and select 'dateToSelect' date
