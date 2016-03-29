@@ -1,4 +1,4 @@
-(function() {
+(function () {
     angular
         .module('datePickerModule', [])
         .service('datePickerService', datePickerService)
@@ -29,12 +29,12 @@
             // execute the options expression in the parent scope
             var options = ctrl.options() || {};
             ctrl.init(angular.extend({}, defaultOptions, options));
-            
+
             // store the jquery element on the controller          
             ctrl.target = element;
 
             $templateRequest("javascripts/templates/days-view.html")
-                .then(function(template) {
+                .then(function (template) {
                     initContainer(template);
                 });
 
@@ -50,17 +50,17 @@
                 if (ctrl.options.inline === true) {
                     element.after(ctrl.container);
                 }
-                // if a jquery parent is specified in options append the container
+                    // if a jquery parent is specified in options append the container
                 else if (angular.isElement(ctrl.options.inline)) {
                     ctrl.options.inline.append(ctrl.container);
-                // else append container to body                    
+                    // else append container to body                    
                 } else {
                     $document.find("body").append(ctrl.container);
                     ctrl.container.addClass("date-picker-absolute-container");
                 }
 
                 // prevents text select on mouse drag, dblclick
-                ctrl.container.css("MozUserSelect", "none").bind("selectstart", function() {
+                ctrl.container.css("MozUserSelect", "none").bind("selectstart", function () {
                     return false;
                 });
 
@@ -71,15 +71,15 @@
             }
 
             // when the target(textbox) gets focus activate the corresponding container
-            element.on("focus", function(e) {
-                scope.$evalAsync(function() {
+            element.on("focus", function (e) {
+                scope.$evalAsync(function () {
                     ctrl.activate();
                 });
             });
 
             // when the target(textbox) changes
-            element.on("keydown", function(e) {
-                scope.$evalAsync(function() {
+            element.on("keydown", function (e) {
+                scope.$evalAsync(function () {
                     var term = element.val();
                     if (term.length === 0 || term === ctrl.targetText) {
                         return;
@@ -87,7 +87,7 @@
 
                     // wait few millisecs before trying to parse
                     // this allows checking if user has stopped typing
-                    var delay = $timeout(function() {
+                    var delay = $timeout(function () {
                         // is term unchanged?
                         if (term == element.val()) {
                             ctrl.applyDateFromTarget();
@@ -106,14 +106,14 @@
             //            })
 
             // hide container upon CLICK outside of the dropdown rectangle region
-            $document.on("click", function(e) {
-                scope.$evalAsync(function() {
+            $document.on("click", function (e) {
+                scope.$evalAsync(function () {
                     _documentClick(e);
                 });
             });
 
             // cleanup on destroy
-            scope.$on('$destroy', function() {
+            scope.$on('$destroy', function () {
                 ctrl.empty();
                 ctrl.container.remove();
             });
@@ -133,9 +133,9 @@
                 }
 
                 // hide the active calendar if user clicks anywhere away from the dropdown list
+                var offset = ctrl.container[0].getBoundingClientRect();
                 var isMouseAwayFromActiveContainer = false;
                 var awayTolerance = 100;
-                var offset = ctrl.container[0].getBoundingClientRect();
 
                 //check if mouse is over the container
                 if (e.pageX < offset.left - awayTolerance
@@ -175,8 +175,9 @@
         var monthNamesLong = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
         //var monthNamesShort = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
-        this.dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+        this.target = null;
         this.containerVisible = false;
         this.validYears = [];
 
@@ -186,14 +187,16 @@
         this.selectedMonth = null;
         this.selectedYear = null;
         this.targetText = null;
+
+        this.dayNames = [];
         this.weeks = [];
 
-        this.activeInstanceId = function() {
+        this.activeInstanceId = function () {
             return activeInstanceId;
         }
 
         // hide any open containers other than the active container
-        this.hideIfInactive = function() {
+        this.hideIfInactive = function () {
             if (that.isInline()) {
                 return;
             }
@@ -204,14 +207,14 @@
             }
         }
 
-        this.isInline = function() {
+        this.isInline = function () {
             // options.inline can be either true or a jquery object
             return that.options.inline === true
                 || angular.isElement(that.options.inline);
         }
 
 
-        this.init = function(options) {
+        this.init = function (options) {
             that.options = options;
             that.instanceId = ++instanceCount;
 
@@ -227,8 +230,17 @@
             if (maxDate == null) {
                 maxDate = new Date(now.getFullYear(), 11, 31);
             }
-            
+
             // create day names array starting at options.dayOfWeekStart
+            var startIndex = that.options.dayOfWeekStart;
+            // keep within valid range 0..6
+            if (startIndex < 0 || startIndex > 6) {
+                startIndex = that.options.dayOfWeekStart = 0;
+            }
+            while (that.dayNames.length < 7) {
+                that.dayNames.push(dayNames[startIndex]);
+                startIndex < 6 ? startIndex++ : startIndex = 0;
+            }
 
             // create an object array of month names
             // a simple simple string array will not work with ng-options
@@ -256,12 +268,12 @@
             that.selectedData = getCellData(that.todayDate);
 
             // build years array
-            for (i = minDate.getFullYear(); i <= maxDate.getFullYear(); i++) {
+            for (i = minDate.getFullYear() ; i <= maxDate.getFullYear() ; i++) {
                 that.validYears.push(i);
             }
         }
 
-        this.applyDateFromTarget = function() {
+        this.applyDateFromTarget = function () {
             if (that.textModelCtrl === null) {
                 return;
             }
@@ -275,37 +287,37 @@
             }
         }
 
-        this.activate = function() {
+        this.activate = function () {
             activeInstanceId = that.instanceId;
 
             that.applyDateFromTarget();
 
-            buildCalendar();    
+            buildCalendar();
 
             that.show();
         }
 
 
-        this.monthChange = function() {
+        this.monthChange = function () {
             buildCalendar();
 
-            _safeCallback(that.options.monthYearChanged, {
+            safeCallback(that.options.monthYearChanged, {
                 month: that.selectedMonth,
                 year: that.selectedYear
             });
         }
 
-        this.yearChange = function() {
+        this.yearChange = function () {
             buildCalendar();
 
-            _safeCallback(that.options.monthYearChanged, {
+            safeCallback(that.options.monthYearChanged, {
                 month: that.selectedMonth,
                 year: that.selectedYear
             });
         }
 
 
-        this.gotoPreviousMonth = function(month, year) {
+        this.gotoPreviousMonth = function (month, year) {
             var my = getPreviousMonthYear(month, year);
 
             that.selectedMonth = my.month;
@@ -313,13 +325,13 @@
 
             buildCalendar();
 
-            _safeCallback(that.options.monthYearChange, {
+            safeCallback(that.options.monthYearChange, {
                 month: that.selectedMonth,
                 year: that.selectedYear
             });
         }
 
-        this.gotoNextMonth = function(month, year) {
+        this.gotoNextMonth = function (month, year) {
             var my = getNextMonthYear(month, year);
 
             that.selectedMonth = my.month;
@@ -327,14 +339,14 @@
 
             buildCalendar();
 
-            _safeCallback(that.options.monthYearChange, {
+            safeCallback(that.options.monthYearChange, {
                 month: that.selectedMonth,
                 year: that.selectedYear
             });
         }
 
 
-        this.dateCellCssClass = function(cellData) {
+        this.dateCellCssClass = function (cellData) {
             var css = {};
 
             var dateVisible = that.isDateVisible(cellData.date);
@@ -347,11 +359,11 @@
             return css;
         }
 
-        this.dateDisplay = function(cellData) {
+        this.dateDisplay = function (cellData) {
             return formatDate(cellData.date, 'DD');
         }
 
-        this.dateSelect = function(cellData) {
+        this.dateSelect = function (cellData) {
             // rebuild if the current month or year do not match today
             buildCalendarIfRequired(cellData.date);
 
@@ -360,12 +372,12 @@
             that.hide();
         }
 
-        this.todayDateSelect = function() {
+        this.todayDateSelect = function () {
             // if date is not in range, do not select and do not hide
             if (!isDateInRange(that.todayDate)) {
                 return;
             }
-            
+
             // rebuild if the current month or year do not match today
             buildCalendarIfRequired(that.todayDate);
 
@@ -375,7 +387,7 @@
         }
 
 
-        this.show = function() {
+        this.show = function () {
             // position calendar if not displayed inline
             if (!that.isInline()) {
                 // the textbox position can change (ex: window resize)
@@ -386,10 +398,10 @@
             that.containerVisible = true;
 
             // callback
-            _safeCallback(that.options.datePickerShown);
+            safeCallback(that.options.datePickerShown);
         }
 
-        this.hide = function() {
+        this.hide = function () {
             // do not hide if displayed inline
             if (that.isInline()) {
                 return;
@@ -403,11 +415,11 @@
             that.containerVisible = false;
 
             // callback
-            _safeCallback(that.options.datePickerHidden);
+            safeCallback(that.options.datePickerHidden);
         }
 
 
-        this.isDateVisible = function(date) {
+        this.isDateVisible = function (date) {
             // if date is from previous/next month show/hide as set in options
             if (date.getMonth() !== that.selectedMonth) {
                 if (that.options.showOtherMonthDates === true) {
@@ -420,27 +432,26 @@
             return true;
         }
 
-        this.isOtherMonth = function(date) {
+        this.isOtherMonth = function (date) {
             return date.getMonth() !== that.selectedMonth;
         }
 
-        this.isDateSelected = function(date) {
+        this.isDateSelected = function (date) {
             if (that.selectedData !== null && angular.isObject(that.selectedData)) {
                 return areDatesEqual(date, that.selectedData.date);
             }
 
             return false;
         }
-        
-        this.isDateEnabled = function(date) {
-            var cellData = calendarItems.find(function(cellData){
+
+        this.isDateEnabled = function (date) {
+            var cellData = calendarItems.find(function (cellData) {
                 return areDatesEqual(cellData.date, date);
             });
-            
+
             // object exists?
-            if (angular.isDefined(cellData))
-            {
-                return cellData.enabled === true;        
+            if (angular.isDefined(cellData)) {
+                return cellData.enabled === true;
             }
 
             // cell data with given date not found
@@ -508,14 +519,41 @@
         function buildCalendarIfRequired(date) {
             // rebuild if the current month or year do not match today
             if (calendarItems.length === 0
-                || date.getMonth() !== that.selectedMonth 
+                || date.getMonth() !== that.selectedMonth
                 || date.getFullYear() !== that.selectedYear) {
-                
+
                 that.selectedMonth = date.getMonth();
                 that.selectedYear = date.getFullYear();
 
                 buildCalendar(date);
             }
+        }
+
+        // maybe there is a better way to do this
+        // 1. start counting the days from the left side (dayOfWeekStart)
+        // 2. increment dayOfWeekStart to mimic moving towards the right side (firstDayOfMonth)
+        // 3. if dayOfWeekStart becomes > 6 reset to 0
+        // continue until dayOfWeekStart === firstDayOfMonth
+        function getDaysBeforeFirstDayOfMonth(dayOfWeekStart, firstDayOfMonth) {
+            if (firstDayOfMonth === dayOfWeekStart
+                || firstDayOfMonth < 0 || firstDayOfMonth > 6
+                || dayOfWeekStart < 0 || dayOfWeekStart > 6) {
+
+                return;
+            }
+
+            var daysBefore = 0;
+
+            while (dayOfWeekStart !== firstDayOfMonth) {
+                daysBefore++;
+
+                dayOfWeekStart++;
+                if (dayOfWeekStart > 6) {
+                    dayOfWeekStart = 0;
+                }
+            }
+
+            return daysBefore;
         }
 
         //build the calendar and select 'dateToSelect' date
@@ -534,34 +572,13 @@
             calendarItems = [];
             that.weeks = [];
 
-            // dayOfWeekStart < firstDayOfMonth
-            // 0   1   2   3   4   5   6
-            // Sun Mon Tue Wed Thu Fri Sat    (1 - firstDayOfMonth)
-            //                         01  => -5 :  
-            //                     01  02  => -4 :
-            //                 01  02  03  => -3 :
-            //             01  02  03  04  => -2 :
-            //         01  02  03  04  05  => -1 :
-            //     01  02  03  04  05  06  =>  0 :
-            // 01  02  03  03  04  05  06  =>  No change firstDayOfMonth === dayOfWeekStart
-            
-            // dayOfWeekStart > firstDayOfMonth
-            // 6   0   1   2   3   4   5
-            // Sat Sun Mon Tue Wed Thu Fri    (-firstDayOfMonth)
-            //                         01  => -5 :  
-            //                     01  02  => -4 :
-            //                 01  02  03  => -3 :
-            //             01  02  03  04  => -2 :
-            //         01  02  03  04  05  => -1 :
-            //     01  02  03  04  05  06  =>  0 :
-            // 01  02  03  03  04  05  06  =>  No change firstDayOfMonth === dayOfWeekStart
-            
             // if first day of month != dayOfWeekStart then start dates from prior month
-            if (dayOfWeekStart < firstDayOfMonth) {
-                date = 1 - firstDayOfMonth;
-            }
-            else if (dayOfWeekStart > firstDayOfMonth) {
-                date = -firstDayOfMonth;
+            if (dayOfWeekStart != firstDayOfMonth) {
+                var daysBefore = getDaysBeforeFirstDayOfMonth(dayOfWeekStart, firstDayOfMonth);
+                if (angular.isDefined(daysBefore)) {
+                    // 0 is one day prior; 1 is two days prior and so forth
+                    date = date - daysBefore;
+                }
             }
 
             while (date <= getDaysInMonth(year, month)) {
@@ -578,7 +595,7 @@
 
             // after the renderDate callbacks find the object with cellData.selected == true.
             // this might have been set on the cellData during callback
-            var selectedCellData = calendarItems.find(function(cellData) {
+            var selectedCellData = calendarItems.find(function (cellData) {
                 // must be enabled to be able to select
                 return cellData.selected === true && cellData.enabled === true;
             });
@@ -588,9 +605,9 @@
             // 2. if cellData exists and the selected property is undefined (not set) set it to selected
             if (angular.isUndefined(selectedCellData)) {
                 if (angular.isDate(dateToSelect)) {
-                    var cellData = calendarItems.find(function(cellData) {
+                    var cellData = calendarItems.find(function (cellData) {
                         // must be enabled to be able to select
-                        return areDatesEqual(cellData.date, dateToSelect) 
+                        return areDatesEqual(cellData.date, dateToSelect)
                             && cellData.enabled === true;
                     });
 
@@ -602,7 +619,7 @@
             }
 
             // populate the that.weeks array. create a 2D array of 7 days per row
-            angular.forEach(calendarItems, function(cellData) {
+            angular.forEach(calendarItems, function (cellData) {
                 if ((datesInWeek % 7) === 0) {
                     that.weeks.push([]);
                     rowIndex = that.weeks.length - 1;
@@ -621,7 +638,7 @@
 
         function raiseRenderDateCallback(cellDataCollection) {
             // raise the callback for each date
-            angular.forEach(cellDataCollection, function(cellData) {
+            angular.forEach(cellDataCollection, function (cellData) {
                 // if date is outside min/max date range set to disable.
                 // do not callback for dates outside range
                 if (!isDateInRange(cellData.date)) {
@@ -631,7 +648,7 @@
 
                 // callback
                 var callbackArgs = { date: cellData.date };
-                _safeCallback(that.options.renderDate, callbackArgs);
+                safeCallback(that.options.renderDate, callbackArgs);
 
                 copySupportedProperties(callbackArgs, cellData);
             });
@@ -653,7 +670,7 @@
             else {
                 cellData.selected = callbackArgs.selected;
             }
-            
+
             cellData.tooltip = callbackArgs.tooltip;
         }
 
@@ -680,7 +697,7 @@
             if (cellData === null || !angular.isObject(cellData)) {
                 return;
             }
-            
+
             // do not select if disabled
             if (cellData.enabled === false) {
                 return;
@@ -694,7 +711,7 @@
 
             updateTargetModel(formatDate(that.selectedData.date));
 
-            _safeCallback(that.options.dateSelected, cellData);
+            safeCallback(that.options.dateSelected, cellData);
         }
 
 
@@ -737,10 +754,10 @@
         }
 
 
-        function _safeCallback(fn, args) {
+        function safeCallback(fn, args) {
             if (angular.isFunction(fn)) {
                 try {
-                    fn(args);
+                    fn.call(that.target, args);
                 } catch (e) {
                     //ignore
                 }
@@ -757,12 +774,18 @@
             // use the .position() function from jquery.ui if available
             // requires both jquery and jquery-ui to be loaded
             if (window.jQuery && window.jQuery.ui) {
-                that.container.position({
+                var pos = {
                     my: "left top",
                     at: "left bottom",
                     of: that.target,
                     collision: "none flip"
-                });
+                };
+
+                if (that.options.positionUsing !== null && angular.isObject(that.options.positionUsing)) {
+                    pos = that.options.positionUsing;
+                }
+
+                that.container.position(pos);
             } else {
                 var scrollTop = $document[0].body.scrollTop || $document[0].documentElement.scrollTop || $window.pageYOffset,
                     scrollLeft = $document[0].body.scrollLeft || $document[0].documentElement.scrollLeft || $window.pageXOffset;
@@ -791,7 +814,7 @@
         }
 
 
-        datePickerService.defaultOptionsDoc = function() {
+        datePickerService.defaultOptionsDoc = function () {
             return defaultOptionsDoc;
         }
     }
@@ -799,14 +822,14 @@
     function datePickerService() {
         var directiveCtrls = [];
 
-        this.addDirectiveCtrl = function(ctrl) {
+        this.addDirectiveCtrl = function (ctrl) {
             if (ctrl) {
                 directiveCtrls.push(ctrl);
             }
         }
 
-        this.hideIfInactive = function(ctrl) {
-            angular.forEach(directiveCtrls, function(value) {
+        this.hideIfInactive = function (ctrl) {
+            angular.forEach(directiveCtrls, function (value) {
                 value.hideIfInactive();
             });
         }
@@ -823,7 +846,6 @@
         maxDate: "12/31/2020",
         dayOfWeekStart: 0,
         showOtherMonthDates: false,
-        positionUsing: null,
         //css class
         containerCssClass: undefined,
         dateVisibleCssClass: "date-visible",

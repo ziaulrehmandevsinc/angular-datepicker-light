@@ -19,11 +19,12 @@
     function InlineController() {
         var vm = this;
 
-        vm.date = "07/04/2016";
+        vm.date = "03/04/2016";
         vm.datePickerOptions = {
             inline: true,
+            showOtherMonthDates: true,
             containerCssClass: "date-picker-container-inline",
-            dayOfWeekStart: 0
+            dayOfWeekStart: 3
         };
     }
 
