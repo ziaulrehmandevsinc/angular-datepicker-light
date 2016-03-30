@@ -2,7 +2,7 @@ div.date-picker-container {
     width: 320px;
     font-family: Helvetica, Arial, sans-serif;
     font-size: 14px;
-    border: solid 1px #6699FF;
+    border: solid 2px #867F7F;
     background-color: White;
     white-space: nowrap;
     padding: 2px;
@@ -99,7 +99,7 @@ div.date-picker-container > div.bottom-panel {
 
     div.date-picker-container > div.bottom-panel a.today {
         font-weight: bold;
-        color: Blue;
+        color: #0028EA;
         text-decoration: none;
     }
 

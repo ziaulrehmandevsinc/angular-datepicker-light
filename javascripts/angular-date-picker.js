@@ -42,7 +42,7 @@
                 var templateFn = $compile(template);
                 ctrl.container = templateFn(scope);
 
-                if (angular.isDefined(ctrl.options.containerCssClass)) {
+                if (angular.isDefined(ctrl.options.containerCssClass && ctrl.options.containerCssClass !== null)) {
                     ctrl.container.addClass(ctrl.options.containerCssClass);
                 }
 
@@ -99,11 +99,11 @@
                 });
             });
 
-            //            angular.element($window).on("resize", function (e) {
-            //                scope.$evalAsync(function () {
-            //                    ctrl.hide();
-            //                });
-            //            })
+            angular.element($window).on("resize", function (e) {
+                scope.$evalAsync(function () {
+                    ctrl.hide();
+                });
+            })
 
             // hide container upon CLICK outside of the dropdown rectangle region
             $document.on("click", function (e) {
@@ -188,7 +188,7 @@
         this.selectedData = null;
         this.selectedMonth = null;
         this.selectedYear = null;
-        
+
         this.dayNames = [];
         this.weeks = [];
 
@@ -222,14 +222,25 @@
             var now = new Date();
 
             // set min and max date values
-            // if not provided in options default minDate to 1/1 and maxDate to 12/31 of current year
-            minDate = parseDate(that.options.minDate);
+            // if not provided in options default minDate to 1/1 and maxDate to 12/31 of next year
+            if (isUndefinedOrNull(that.options.minDate)) {
+                minDate = null
+            }
+            else {
+                minDate = parseDate(that.options.minDate);
+            }
             if (minDate == null) {
                 minDate = new Date(now.getFullYear(), 0, 1);
             }
-            maxDate = parseDate(that.options.maxDate);
+            // maxdate
+            if (isUndefinedOrNull(that.options.maxDate)) {
+                maxDate = null
+            }
+            else {
+                maxDate = parseDate(that.options.maxDate);
+            }
             if (maxDate == null) {
-                maxDate = new Date(now.getFullYear(), 11, 31);
+                maxDate = new Date(now.getFullYear() + 1, 11, 31);
             }
 
             // create day names array starting at options.firstDayOfWeek
@@ -267,7 +278,7 @@
             that.selectedMonth = that.todayDate.getMonth();
             that.selectedYear = that.todayDate.getFullYear();
             that.selectedData = getCellData(that.todayDate);
-            
+
             buildCalendar();
 
             // build years array
@@ -288,13 +299,12 @@
             if (date !== null && isDateInRange(date)) {
                 // sets the that.selectedMonth and that.selectedYear if different
                 var updated = setMonthYear(date);
-                
+
                 // build calendar only if month or year changed
-                if (updated === true)
-                {
-                    buildCalendar();        
+                if (updated === true) {
+                    buildCalendar();
                 }
-                
+
                 applySelection(date, true);
             }
         }
@@ -303,7 +313,7 @@
             activeInstanceId = that.instanceId;
 
             that.tryApplyDateFromTarget();
-            
+
             that.show();
         }
 
@@ -365,10 +375,9 @@
             css[that.options.dateOtherMonthCssClass] = dateVisible && that.isOtherMonth(cellData.date);
             css[that.options.dateSelectedCssClass] = dateVisible && that.isDateSelected(cellData.date);
             css[that.options.dateDisabledCssClass] = dateVisible && (cellData.enabled === false);
-            
+
             // custom css class added in callback
-            if (!isUndefinedOrNull(cellData.cssClass))
-            {
+            if (!isUndefinedOrNull(cellData.cssClass)) {
                 css[cellData.cssClass] = true;
             }
 
@@ -383,13 +392,12 @@
             // sets the that.selectedMonth and that.selectedYear if different
             // this is required if the selected date belongs to other month
             var updated = setMonthYear(cellData.date);
-            
+
             // build calendar only if month or year changed
-            if (updated === true)
-            {
-                buildCalendar();        
+            if (updated === true) {
+                buildCalendar();
             }
-            
+
             applySelection(cellData.date);
 
             that.hide();
@@ -405,11 +413,10 @@
             var updated = setMonthYear(that.todayDate);
 
             // build calendar only if month or year changed
-            if (updated === true)
-            {
-                buildCalendar();        
+            if (updated === true) {
+                buildCalendar();
             }
-            
+
             applySelection(that.todayDate);
 
             that.hide();
@@ -442,7 +449,7 @@
             }
 
             that.containerVisible = false;
-            
+
             // callback
             safeCallback(that.options.datePickerHidden);
         }
@@ -466,7 +473,7 @@
         }
 
         this.isDateSelected = function (date) {
-            if (that.selectedData !== null && angular.isObject(that.selectedData)) {
+            if (!isUndefinedOrNull(that.selectedData) && angular.isObject(that.selectedData)) {
                 return areDatesEqual(date, that.selectedData.date);
             }
 
@@ -479,7 +486,7 @@
             });
 
             // object exists?
-            if (angular.isDefined(cellData)) {
+            if (!isUndefinedOrNull(cellData)) {
                 return cellData.enabled === true;
             }
 
@@ -549,15 +556,15 @@
         function setMonthYear(date) {
             var month = date.getMonth();
             var year = date.getFullYear();
-            
+
             // update properties if different
             if (month !== that.selectedMonth || year !== that.selectedYear) {
                 that.selectedMonth = month;
                 that.selectedYear = year;
-                
+
                 return true;
             }
-            
+
             return false;
         }
 
@@ -607,7 +614,7 @@
             // if first day of month != firstDayOfWeek then start dates from prior month
             if (firstDayOfWeek != firstDayOfMonth) {
                 var daysBefore = getDaysBeforeFirstDayOfMonth(firstDayOfWeek, firstDayOfMonth);
-                if (angular.isDefined(daysBefore)) {
+                if (!isUndefinedOrNull(daysBefore)) {
                     // 0 is one day prior; 1 is two days prior and so forth
                     date = date - daysBefore;
                 }
@@ -633,7 +640,7 @@
 
                 datesInWeek++;
             });
-            
+
             //raise the callback for each cell data
             raiseRenderDateCallback(calendarItems);
         }
@@ -648,36 +655,41 @@
                     return;
                 }
 
-                // callback
-                var callbackArgs = { date: cellData.date };
-                safeCallback(that.options.renderDate, callbackArgs);
+                // callback for each date
+                var cbRetVal = safeCallback(that.options.renderDate, { date: cellData.date });
 
-                copySupportedProperties(callbackArgs, cellData);
+                // pass an empty literal in case nothing was returned from callback
+                copySupportedProperties(cbRetVal || {}, cellData);
             });
         }
 
-        function copySupportedProperties(callbackArgs, cellData) {
+        function copySupportedProperties(cbRetVal, cellData) {
             // if callbackArgs.enabled is undefined default to true
-            if (isUndefinedOrNull(callbackArgs.enabled)) {
+            if (isUndefinedOrNull(cbRetVal.enabled)) {
                 cellData.enabled = true;
             }
             else {
-                cellData.enabled = callbackArgs.enabled;
+                cellData.enabled = cbRetVal.enabled;
             }
 
             // in order to set selected = true, enabled must also be true
-            if (callbackArgs.selected === true && cellData.enabled === true) {
+            if (cbRetVal.selected === true && cellData.enabled === true) {
                 cellData.selected = true;
             }
             else {
-                cellData.selected = callbackArgs.selected;
+                cellData.selected = cbRetVal.selected;
             }
 
-            cellData.cssClass = callbackArgs.cssClass
-            cellData.data = callbackArgs.data;
-            cellData.tooltip = callbackArgs.tooltip;
+            // css class to apply to the date <td>
+            cellData.cssClass = cbRetVal.cssClass
+
+            // arbitrary custom data to store with date
+            cellData.data = cbRetVal.data;
+
+            // tooltip for the date <td>
+            cellData.tooltip = cbRetVal.tooltip;
         }
-        
+
         function postRenderDateCallback(dateToSelect) {
             // after the renderDate callbacks find the object with cellData.selected == true.
             // this might have been set on the cellData during callback
@@ -703,7 +715,7 @@
                     }
                 }
             }
-            
+
             return selectedCellData;
         }
 
@@ -730,7 +742,7 @@
 
         function applySelection(dateToSelect, updatingFromTarget) {
             var cellData = postRenderDateCallback(dateToSelect);
-            
+
             if (isUndefinedOrNull(cellData)) {
                 return;
             }
@@ -740,12 +752,10 @@
                 return;
             }
 
-            var callbackArgs = { date: cellData.date, cancel: false, data: cellData.data };
-            safeCallback(that.options.beforeDateSelect, callbackArgs);
-            
+            var cbRetVal = safeCallback(that.options.beforeDateSelect, { date: cellData.date, cancel: false, data: cellData.data });
+
             // cancel selection if set to true from callback
-            if (callbackArgs.cancel === true)
-            {
+            if (!isUndefinedOrNull(cbRetVal) && cbRetVal.cancel === true) {
                 return;
             }
 
@@ -753,12 +763,11 @@
             that.selectedYear = cellData.date.getFullYear();
             that.selectedData = cellData;
 
-            if (updatingFromTarget !== true)
-            {
+            if (updatingFromTarget !== true) {
                 updateTargetModel(formatDate(that.selectedData.date));
             }
 
-            safeCallback(that.options.dateSelected, cellData);
+            safeCallback(that.options.dateSelected, { date: cellData.date, data: cellData.data });
         }
 
 
@@ -799,7 +808,7 @@
         function areDatesEqual(date1, date2) {
             return moment(date1).isSame(moment(date2), 'day');
         }
-        
+
         function isUndefinedOrNull(value) {
             return (angular.isUndefined(value) || value === null);
         }
@@ -808,7 +817,7 @@
         function safeCallback(fn, args) {
             if (angular.isFunction(fn)) {
                 try {
-                    fn.call(that.target, args);
+                    return fn.call(that.target, args);
                 } catch (e) {
                     //ignore
                 }
@@ -832,7 +841,7 @@
                     collision: "none flip"
                 };
 
-                if (that.options.positionUsing !== null && angular.isObject(that.options.positionUsing)) {
+                if (!isUndefinedOrNull(that.options.positionUsing) && angular.isObject(that.options.positionUsing)) {
                     pos = that.options.positionUsing;
                 }
 
@@ -893,8 +902,8 @@
         altTarget: null,
         inline: false,
         dateFormat: 'MM/DD/YYYY',
-        minDate: "01/01/2016",
-        maxDate: "12/31/2020",
+        minDate: null,
+        maxDate: null,
         firstDayOfWeek: 0,
         showOtherMonthDates: false,
         //css class
