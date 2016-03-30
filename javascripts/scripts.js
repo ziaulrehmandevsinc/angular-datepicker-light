@@ -7,6 +7,7 @@
         .controller('InlineController', InlineController)
         .controller('InlineOtherMonthDatesController', InlineOtherMonthDatesController)
         .controller('InlineDisabledDatesController', InlineDisabledDatesController)
+        .controller('InlineWeekStartDayController', InlineWeekStartDayController)
     ;
 
     // on focus
@@ -22,9 +23,8 @@
         vm.date = "03/04/2016";
         vm.datePickerOptions = {
             inline: true,
-            showOtherMonthDates: true,
             containerCssClass: "date-picker-container-inline",
-            dayOfWeekStart: 3
+            firstDayOfWeek: 3
         };
     }
 
@@ -32,7 +32,7 @@
     function InlineOtherMonthDatesController() {
         var vm = this;
 
-        vm.date = "07/21/2016";
+        vm.date = "07/20/2016";
 
         vm.datePickerOptions = {
             inline: true,
@@ -41,6 +41,19 @@
         };
     }
 
+    // inline, week starts on Monday
+    function InlineWeekStartDayController() {
+        var vm = this;
+
+        vm.date = "07/01/2016";
+
+        vm.datePickerOptions = {
+            inline: true,
+            firstDayOfWeek: 1,
+            containerCssClass: "date-picker-container-inline"
+        };
+    }
+    
     // inline, disabled dates, tooltip
     function InlineDisabledDatesController() {
         var vm = this;

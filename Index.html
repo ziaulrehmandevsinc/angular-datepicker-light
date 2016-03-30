@@ -54,6 +54,17 @@
             </div>
         </div>
 
+        <div style="margin-top: 10px" ng-controller="InlineWeekStartDayController as vm">
+            <h3>Example 4: Custom Week Start Day</h3>
+            <div>
+                <input type="text"
+                       ng-model="vm.date"
+                       class="form-control"
+                       style="width:20%"
+                       angular-date-picker="vm.datePickerOptions" />
+            </div>
+        </div>
+        
         <div style="margin-top: 10px" ng-controller="InlineDisabledDatesController as vm">
             <h3>Example 4: Disabled Dates</h3>
             <div>

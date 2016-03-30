@@ -90,7 +90,7 @@
                     var delay = $timeout(function () {
                         // is term unchanged?
                         if (term == element.val()) {
-                            ctrl.applyDateFromTarget();
+                            ctrl.tryApplyDateFromTarget();
                         }
 
                         //cancel the timeout
@@ -232,11 +232,11 @@
                 maxDate = new Date(now.getFullYear(), 11, 31);
             }
 
-            // create day names array starting at options.dayOfWeekStart
-            var startIndex = that.options.dayOfWeekStart;
+            // create day names array starting at options.firstDayOfWeek
+            var startIndex = that.options.firstDayOfWeek;
             // keep within valid range 0..6
             if (startIndex < 0 || startIndex > 6) {
-                startIndex = that.options.dayOfWeekStart = 0;
+                startIndex = that.options.firstDayOfWeek = 0;
             }
             while (that.dayNames.length < 7) {
                 that.dayNames.push(dayNames[startIndex]);
@@ -267,6 +267,8 @@
             that.selectedMonth = that.todayDate.getMonth();
             that.selectedYear = that.todayDate.getFullYear();
             that.selectedData = getCellData(that.todayDate);
+            
+            buildCalendar();
 
             // build years array
             for (i = minDate.getFullYear() ; i <= maxDate.getFullYear() ; i++) {
@@ -274,7 +276,7 @@
             }
         }
 
-        this.applyDateFromTarget = function () {
+        this.tryApplyDateFromTarget = function () {
             if (that.textModelCtrl === null) {
                 return;
             }
@@ -284,17 +286,24 @@
 
             // if date is valid and in range build calendar if needed
             if (date !== null && isDateInRange(date)) {
-                buildCalendarIfRequired(date);
+                // sets the that.selectedMonth and that.selectedYear if different
+                var updated = setMonthYear(date);
+                
+                // build calendar only if month or year changed
+                if (updated === true)
+                {
+                    buildCalendar();        
+                }
+                
+                applySelection(date, true);
             }
         }
 
         this.activate = function () {
             activeInstanceId = that.instanceId;
 
-            that.applyDateFromTarget();
-
-            buildCalendar();
-
+            that.tryApplyDateFromTarget();
+            
             that.show();
         }
 
@@ -365,10 +374,17 @@
         }
 
         this.dateSelect = function (cellData) {
-            // rebuild if the current month or year do not match today
-            buildCalendarIfRequired(cellData.date);
-
-            applySelection(cellData);
+            // sets the that.selectedMonth and that.selectedYear if different
+            // this is required if the selected date belongs to other month
+            var updated = setMonthYear(cellData.date);
+            
+            // build calendar only if month or year changed
+            if (updated === true)
+            {
+                buildCalendar();        
+            }
+            
+            applySelection(cellData.date);
 
             that.hide();
         }
@@ -379,10 +395,16 @@
                 return;
             }
 
-            // rebuild if the current month or year do not match today
-            buildCalendarIfRequired(that.todayDate);
+            // sets the that.selectedMonth and that.selectedYear if different
+            var updated = setMonthYear(that.todayDate);
 
-            applySelection(getCellData(that.todayDate));
+            // build calendar only if month or year changed
+            if (updated === true)
+            {
+                buildCalendar();        
+            }
+            
+            applySelection(that.todayDate);
 
             that.hide();
         }
@@ -516,55 +538,58 @@
             };
         }
 
-
-        function buildCalendarIfRequired(date) {
-            // rebuild if the current month or year do not match today
-            if (calendarItems.length === 0
-                || date.getMonth() !== that.selectedMonth
-                || date.getFullYear() !== that.selectedYear) {
-
-                that.selectedMonth = date.getMonth();
-                that.selectedYear = date.getFullYear();
-
-                buildCalendar(date);
+        // sets that.selectedMonth and that.selectedYear if different
+        // return true if the properties were set
+        function setMonthYear(date) {
+            var month = date.getMonth();
+            var year = date.getFullYear();
+            
+            // update properties if different
+            if (month !== that.selectedMonth || year !== that.selectedYear) {
+                that.selectedMonth = month;
+                that.selectedYear = year;
+                
+                return true;
             }
+            
+            return false;
         }
 
         // maybe there is a better way to do this
-        // 1. start counting the days from the left side (dayOfWeekStart)
-        // 2. increment dayOfWeekStart to mimic moving towards the right side (firstDayOfMonth)
-        // 3. if dayOfWeekStart becomes > 6 reset to 0
-        // continue until dayOfWeekStart === firstDayOfMonth
-        function getDaysBeforeFirstDayOfMonth(dayOfWeekStart, firstDayOfMonth) {
-            if (firstDayOfMonth === dayOfWeekStart
+        // 1. start counting the days from the left side (firstDayOfWeek)
+        // 2. increment firstDayOfWeek to mimic moving towards the right side (firstDayOfMonth)
+        // 3. if firstDayOfWeek becomes > 6 reset to 0
+        // continue until firstDayOfWeek === firstDayOfMonth
+        function getDaysBeforeFirstDayOfMonth(firstDayOfWeek, firstDayOfMonth) {
+            if (firstDayOfMonth === firstDayOfWeek
                 || firstDayOfMonth < 0 || firstDayOfMonth > 6
-                || dayOfWeekStart < 0 || dayOfWeekStart > 6) {
+                || firstDayOfWeek < 0 || firstDayOfWeek > 6) {
 
                 return;
             }
 
             var daysBefore = 0;
 
-            while (dayOfWeekStart !== firstDayOfMonth) {
+            while (firstDayOfWeek !== firstDayOfMonth) {
                 daysBefore++;
 
-                dayOfWeekStart++;
-                if (dayOfWeekStart > 6) {
-                    dayOfWeekStart = 0;
+                firstDayOfWeek++;
+                if (firstDayOfWeek > 6) {
+                    firstDayOfWeek = 0;
                 }
             }
 
             return daysBefore;
         }
 
-        //build the calendar and select 'dateToSelect' date
-        function buildCalendar(dateToSelect) {
+        // build the calendar array
+        function buildCalendar() {
             var year = that.selectedYear;
             var month = that.selectedMonth;
 
             var firstDateOfMonth = getDate(year, month, 1);
             var firstDayOfMonth = firstDateOfMonth.getDay();
-            var dayOfWeekStart = that.options.dayOfWeekStart;
+            var firstDayOfWeek = that.options.firstDayOfWeek;
 
             var rowIndex = 0,
                 datesInWeek = 0,
@@ -573,9 +598,9 @@
             calendarItems = [];
             that.weeks = [];
 
-            // if first day of month != dayOfWeekStart then start dates from prior month
-            if (dayOfWeekStart != firstDayOfMonth) {
-                var daysBefore = getDaysBeforeFirstDayOfMonth(dayOfWeekStart, firstDayOfMonth);
+            // if first day of month != firstDayOfWeek then start dates from prior month
+            if (firstDayOfWeek != firstDayOfMonth) {
+                var daysBefore = getDaysBeforeFirstDayOfMonth(firstDayOfWeek, firstDayOfMonth);
                 if (angular.isDefined(daysBefore)) {
                     // 0 is one day prior; 1 is two days prior and so forth
                     date = date - daysBefore;
@@ -591,34 +616,6 @@
                 calendarItems.push(getCellData(getDate(year, month, date++)));
             }
 
-            //raise the callback for each cell data
-            raiseRenderDateCallback(calendarItems)
-
-            // after the renderDate callbacks find the object with cellData.selected == true.
-            // this might have been set on the cellData during callback
-            var selectedCellData = calendarItems.find(function (cellData) {
-                // must be enabled to be able to select
-                return cellData.selected === true && cellData.enabled === true;
-            });
-
-            // if no object exists with 'selected' = true perform the following:
-            // 1. if 'dateToSelect' is provided find the cell data with that date
-            // 2. if cellData exists and the selected property is undefined (not set) set it to selected
-            if (angular.isUndefined(selectedCellData)) {
-                if (angular.isDate(dateToSelect)) {
-                    var cellData = calendarItems.find(function (cellData) {
-                        // must be enabled to be able to select
-                        return areDatesEqual(cellData.date, dateToSelect)
-                            && cellData.enabled === true;
-                    });
-
-                    // set 'selected' to true only if its undefined
-                    if (angular.isObject(cellData) && angular.isUndefined(cellData.selected)) {
-                        selectedCellData = cellData;
-                    }
-                }
-            }
-
             // populate the that.weeks array. create a 2D array of 7 days per row
             angular.forEach(calendarItems, function (cellData) {
                 if ((datesInWeek % 7) === 0) {
@@ -630,11 +627,9 @@
 
                 datesInWeek++;
             });
-
-            // apply selection if selected cell data is available
-            if (angular.isObject(selectedCellData)) {
-                applySelection(selectedCellData);
-            }
+            
+            //raise the callback for each cell data
+            raiseRenderDateCallback(calendarItems);
         }
 
         function raiseRenderDateCallback(cellDataCollection) {
@@ -674,6 +669,35 @@
 
             cellData.tooltip = callbackArgs.tooltip;
         }
+        
+        function postRenderDateCallback(dateToSelect) {
+            // after the renderDate callbacks find the object with cellData.selected == true.
+            // this might have been set on the cellData during callback
+            var selectedCellData = calendarItems.find(function (cellData) {
+                // must be enabled to be able to select
+                return cellData.selected === true && cellData.enabled === true;
+            });
+
+            // if no object exists with 'selected' = true perform the following:
+            // 1. if 'dateToSelect' is provided find the cell data with that date
+            // 2. if cellData exists and the selected property is undefined (not set) set it to selected
+            if (angular.isUndefined(selectedCellData)) {
+                if (angular.isDate(dateToSelect)) {
+                    var cellData = calendarItems.find(function (cellData) {
+                        // must be enabled to be able to select
+                        return areDatesEqual(cellData.date, dateToSelect)
+                            && cellData.enabled === true;
+                    });
+
+                    // set 'selected' to true only if its undefined
+                    if (angular.isObject(cellData) && angular.isUndefined(cellData.selected)) {
+                        selectedCellData = cellData;
+                    }
+                }
+            }
+            
+            return selectedCellData;
+        }
 
 
         function getDate(year, month, day) {
@@ -694,8 +718,10 @@
         }
 
 
-        function applySelection(cellData) {
-            if (cellData === null || !angular.isObject(cellData)) {
+        function applySelection(dateToSelect, updatingFromTarget) {
+            var cellData = postRenderDateCallback(dateToSelect);
+            
+            if (angular.isUndefined(cellData)) {
                 return;
             }
 
@@ -704,13 +730,16 @@
                 return;
             }
 
-            cellData.selected = true;
+            //cellData.selected = true;
 
             that.selectedMonth = cellData.date.getMonth();
             that.selectedYear = cellData.date.getFullYear();
             that.selectedData = cellData;
 
-            updateTargetModel(formatDate(that.selectedData.date));
+            if (updatingFromTarget !== true)
+            {
+                updateTargetModel(formatDate(that.selectedData.date));
+            }
 
             safeCallback(that.options.dateSelected, cellData);
         }
@@ -811,6 +840,7 @@
                 that.textModelCtrl.$render();
 
                 targetValue = modelValue;
+                console.log("updateTargetModel");
             }
         }
 
@@ -845,7 +875,7 @@
         dateFormat: 'MM/DD/YYYY',
         minDate: "01/01/2016",
         maxDate: "12/31/2020",
-        dayOfWeekStart: 0,
+        firstDayOfWeek: 0,
         showOtherMonthDates: false,
         //css class
         containerCssClass: undefined,
