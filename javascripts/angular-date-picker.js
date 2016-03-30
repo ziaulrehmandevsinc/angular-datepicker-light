@@ -163,8 +163,8 @@
         }
     }
 
-    MainCtrl.$inject = ["$q", "$window", "$document", "$sce", "datePickerService"];
-    function MainCtrl($q, $window, $document, $sce, datePickerService) {
+    MainCtrl.$inject = ["$window", "$document", "datePickerService"];
+    function MainCtrl($window, $document, datePickerService) {
         var that = this;
 
         var activeInstanceId = 0,
@@ -436,7 +436,7 @@
             }
 
             that.containerVisible = false;
-
+            
             // callback
             safeCallback(that.options.datePickerHidden);
         }
@@ -840,7 +840,6 @@
                 that.textModelCtrl.$render();
 
                 targetValue = modelValue;
-                console.log("updateTargetModel");
             }
         }
 
