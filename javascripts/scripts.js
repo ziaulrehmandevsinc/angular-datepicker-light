@@ -64,14 +64,20 @@
             inline: true,
             containerCssClass: "date-picker-container-inline",
             //datePickerParent: $("#datePickerParent3"),
-            renderDate: function (cellData) {
-                var date = cellData.date.getDate();
+            renderDate: function (args) {
+                var date = args.date.getDate();
 
                 // enable custom dates
                 var enabled = (date < 20 || date > 29);
 
-                cellData.enabled = enabled;
-                cellData.tooltip = enabled ? "Working Day" : "Holiday";
+                args.enabled = enabled;
+                args.tooltip = enabled ? "Working Day" : "Holiday";
+            },
+            beforeDateSelect: function(args)
+            {
+                var date = args.date.getDate();
+                
+                args.cancel = date === 30;
             }
         };
     }

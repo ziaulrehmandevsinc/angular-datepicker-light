@@ -365,6 +365,12 @@
             css[that.options.dateOtherMonthCssClass] = dateVisible && that.isOtherMonth(cellData.date);
             css[that.options.dateSelectedCssClass] = dateVisible && that.isDateSelected(cellData.date);
             css[that.options.dateDisabledCssClass] = dateVisible && (cellData.enabled === false);
+            
+            // custom css class added in callback
+            if (!isUndefinedOrNull(cellData.cssClass))
+            {
+                css[cellData.cssClass] = true;
+            }
 
             return css;
         }
@@ -652,7 +658,7 @@
 
         function copySupportedProperties(callbackArgs, cellData) {
             // if callbackArgs.enabled is undefined default to true
-            if (angular.isUndefined(callbackArgs.enabled)) {
+            if (isUndefinedOrNull(callbackArgs.enabled)) {
                 cellData.enabled = true;
             }
             else {
@@ -667,6 +673,8 @@
                 cellData.selected = callbackArgs.selected;
             }
 
+            cellData.cssClass = callbackArgs.cssClass
+            cellData.data = callbackArgs.data;
             cellData.tooltip = callbackArgs.tooltip;
         }
         
@@ -680,8 +688,8 @@
 
             // if no object exists with 'selected' = true perform the following:
             // 1. if 'dateToSelect' is provided find the cell data with that date
-            // 2. if cellData exists and the selected property is undefined (not set) set it to selected
-            if (angular.isUndefined(selectedCellData)) {
+            // 2. select the cellData if it exists and the selected property is not set
+            if (isUndefinedOrNull(selectedCellData)) {
                 if (angular.isDate(dateToSelect)) {
                     var cellData = calendarItems.find(function (cellData) {
                         // must be enabled to be able to select
@@ -689,8 +697,8 @@
                             && cellData.enabled === true;
                     });
 
-                    // set 'selected' to true only if its undefined
-                    if (angular.isObject(cellData) && angular.isUndefined(cellData.selected)) {
+                    // set 'selected' to true only if its undefined/null
+                    if (angular.isObject(cellData) && isUndefinedOrNull(cellData.selected)) {
                         selectedCellData = cellData;
                     }
                 }
@@ -713,7 +721,9 @@
                 date: date,
                 enabled: true,
                 selected: angular.undefined,
-                tooltip: angular.undefined
+                tooltip: angular.undefined,
+                cssClass: angular.undefined,
+                data: angular.undefined,
             }
         }
 
@@ -721,7 +731,7 @@
         function applySelection(dateToSelect, updatingFromTarget) {
             var cellData = postRenderDateCallback(dateToSelect);
             
-            if (angular.isUndefined(cellData)) {
+            if (isUndefinedOrNull(cellData)) {
                 return;
             }
 
@@ -730,7 +740,14 @@
                 return;
             }
 
-            //cellData.selected = true;
+            var callbackArgs = { date: cellData.date, cancel: false, data: cellData.data };
+            safeCallback(that.options.beforeDateSelect, callbackArgs);
+            
+            // cancel selection if set to true from callback
+            if (callbackArgs.cancel === true)
+            {
+                return;
+            }
 
             that.selectedMonth = cellData.date.getMonth();
             that.selectedYear = cellData.date.getFullYear();
@@ -781,6 +798,10 @@
 
         function areDatesEqual(date1, date2) {
             return moment(date1).isSame(moment(date2), 'day');
+        }
+        
+        function isUndefinedOrNull(value) {
+            return (angular.isUndefined(value) || value === null);
         }
 
 
@@ -886,6 +907,7 @@
         datePickerShown: angular.noop,
         datePickerHidden: angular.noop,
         renderDate: angular.noop,
+        beforeDateSelect: angular.noop,
         dateSelected: angular.noop,
         monthYearChanged: angular.noop
     };
