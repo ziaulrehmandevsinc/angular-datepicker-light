@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
     <meta name="viewport" content="width=device-width,user-scalable=no" />
-    <title>AngularJS date-picker-light plugin</title>
+    <title>AngularJS datepicker-light plugin</title>
 
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" />
     <link rel="stylesheet" type="text/css" href="stylesheets/bootstrap.css" />
@@ -23,7 +23,7 @@
             width: 100px;
         }
 
-        div.date-picker-container-inline {
+        div.datepicker-container-inline {
             margin-top: 3px;
         }
 
@@ -41,7 +41,7 @@
 <body ng-app="mainApp">
     <div class="content">
 
-        <h1 class="title">AngularJS date-picker-light plugin</h1>
+        <h1 class="title">AngularJS datepicker-light plugin</h1>
         <p>
             <code>npm install angular-datepicker-light</code> or <code>bower install angular-datepicker-light</code>
         </p>
@@ -49,13 +49,13 @@
 
             <div class="row">
                 <div class="scenario">
-                    <div ng-controller="OnFocusController as vm">
+                    <div ng-controller="OnFocusCtrl as vm">
                         <h3>Example 1: Show on Focus</h3>
                         <div>
                             <input type="text"
                                    ng-model="vm.date"
                                    class="form-control"
-                                   angular-date-picker="vm.datePickerOptions" />
+                                   angular-datepicker="vm.datepickerOptions" />
                         </div>
                     </div>
                 </div>
@@ -63,13 +63,13 @@
 
             <div class="row" style="margin-top: 300px">
                 <div class="scenario">
-                    <div ng-controller="InlineController as vm">
+                    <div ng-controller="InlineCtrl as vm">
                         <h3>Example 2: Inline</h3>
                         <div>
                             <input type="text"
                                    ng-model="vm.date"
                                    class="form-control"
-                                   angular-date-picker="vm.datePickerOptions" />
+                                   angular-datepicker="vm.datepickerOptions" />
                         </div>
                     </div>
                 </div>
@@ -77,13 +77,13 @@
 
             <div class="row">
                 <div class="scenario">
-                    <div ng-controller="InlineOtherMonthDatesController as vm">
+                    <div ng-controller="InlineOtherMonthDatesCtrl as vm">
                         <h3>Example 3: Show Dates from Other Months</h3>
                         <div>
                             <input type="text"
                                    ng-model="vm.date"
                                    class="form-control"
-                                   angular-date-picker="vm.datePickerOptions" />
+                                   angular-datepicker="vm.datepickerOptions" />
                         </div>
                     </div>
                 </div>
@@ -91,13 +91,13 @@
 
             <div class="row">
                 <div class="scenario">
-                    <div ng-controller="InlineCustomWeekStartController as vm">
+                    <div ng-controller="InlineCustomWeekStartCtrl as vm">
                         <h3>Example 4: Custom Week Start</h3>
                         <div>
                             <input type="text"
                                    ng-model="vm.date"
                                    class="form-control"
-                                   angular-date-picker="vm.datePickerOptions" />
+                                   angular-datepicker="vm.datepickerOptions" />
                         </div>
                     </div>
                 </div>
@@ -105,14 +105,13 @@
 
             <div class="row">
                 <div class="scenario">
-                    <div ng-controller="InlineDisabledDatesController as vm">
+                    <div ng-controller="InlineDisabledDatesCtrl as vm">
                         <h3>Example 5: Disabled Dates</h3>
                         <div>
                             <input type="text"
                                    ng-model="vm.date"
                                    class="form-control"
-                                   angular-date-picker="vm.datePickerOptions" />
-                            <!--<div id="datePickerParent3" style="margin-top:3px;"></div>-->
+                                   angular-datepicker="vm.datepickerOptions" />
                         </div>
                     </div>
                 </div>
@@ -120,9 +119,10 @@
 
             <div class="row">
                 <div class="scenario">
-                    <div ng-controller="InlineDivTargetController as vm">
+                    <div ng-controller="InlineDivTargetCtrl as vm">
                         <h3>Example 6: &lt;Div&gt; Target Element</h3>
-                        <div class="date-target" angular-date-picker="vm.datePickerOptions">
+                        <div class="date-target" 
+                             angular-datepicker="vm.datepickerOptions">
                             {{vm.date | date:'MM / dd / yyyy'}}
                         </div>
                     </div>

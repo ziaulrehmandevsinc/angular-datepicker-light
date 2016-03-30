@@ -2,70 +2,70 @@
     'use strict';
 
     angular
-        .module('mainApp', ['datePickerModule'])
-        .controller('OnFocusController', OnFocusController)
-        .controller('InlineController', InlineController)
-        .controller('InlineOtherMonthDatesController', InlineOtherMonthDatesController)
-        .controller('InlineDisabledDatesController', InlineDisabledDatesController)
-        .controller('InlineCustomWeekStartController', InlineCustomWeekStartController)
-        .controller('InlineDivTargetController', InlineDivTargetController);
+        .module('mainApp', ['datepickerModule'])
+        .controller('OnFocusCtrl', OnFocusCtrl)
+        .controller('InlineCtrl', InlineCtrl)
+        .controller('InlineOtherMonthDatesCtrl', InlineOtherMonthDatesCtrl)
+        .controller('InlineDisabledDatesCtrl', InlineDisabledDatesCtrl)
+        .controller('InlineCustomWeekStartCtrl', InlineCustomWeekStartCtrl)
+        .controller('InlineDivTargetCtrl', InlineDivTargetCtrl);
 
     var today = new Date();
     var mom = moment(today);
     var dateText = mom.format("MM/DD/YYYY");
 
     // on focus
-    function OnFocusController() {
+    function OnFocusCtrl() {
         var vm = this;
         vm.date = dateText;
     }
 
     // inline
-    function InlineController() {
+    function InlineCtrl() {
         var vm = this;
 
         vm.date = dateText;
-        vm.datePickerOptions = {
+        vm.datepickerOptions = {
             inline: true,
-            containerCssClass: "date-picker-container-inline"
+            containerCssClass: "datepicker-container-inline"
         };
     }
 
     // inline, other month dates
-    function InlineOtherMonthDatesController() {
+    function InlineOtherMonthDatesCtrl() {
         var vm = this;
 
         vm.date = dateText;
 
-        vm.datePickerOptions = {
+        vm.datepickerOptions = {
             inline: true,
             showOtherMonthDates: true,
-            containerCssClass: "date-picker-container-inline"
+            containerCssClass: "datepicker-container-inline"
         };
     }
 
     // inline, week starts on Monday
-    function InlineCustomWeekStartController() {
+    function InlineCustomWeekStartCtrl() {
         var vm = this;
 
         vm.date = dateText;
 
-        vm.datePickerOptions = {
+        vm.datepickerOptions = {
             inline: true,
             firstDayOfWeek: 1,
-            containerCssClass: "date-picker-container-inline"
+            containerCssClass: "datepicker-container-inline"
         };
     }
 
     // inline, disabled dates, tooltip
-    function InlineDisabledDatesController() {
+    function InlineDisabledDatesCtrl() {
         var vm = this;
 
         vm.date = dateText;
 
-        vm.datePickerOptions = {
+        vm.datepickerOptions = {
             inline: true,
-            containerCssClass: "date-picker-container-inline",
+            containerCssClass: "datepicker-container-inline",
             renderDate: function (e) {
                 var date = e.date.getDate();
 
@@ -82,14 +82,14 @@
         };
     }
 
-    function InlineDivTargetController() {
+    function InlineDivTargetCtrl() {
         var vm = this;
 
         vm.date = today;
 
-        vm.datePickerOptions = {
+        vm.datepickerOptions = {
             inline: true,
-            containerCssClass: "date-picker-container-inline",
+            containerCssClass: "datepicker-container-inline",
             dateSelected: function (e) {
                 vm.date = e.date;
             }

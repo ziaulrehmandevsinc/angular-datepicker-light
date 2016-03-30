@@ -1,11 +1,11 @@
 (function () {
     angular
-        .module('datePickerModule', [])
-        .service('datePickerService', datePickerService)
-        .directive('angularDatePicker', datePickerDirective);
+        .module('datepickerModule', [])
+        .service('datepickerService', datepickerService)
+        .directive('angularDatePicker', datepickerDirective);
 
-    datePickerDirective.$inject = ["$compile", "$document", "$window", "$timeout", "$templateRequest", "datePickerService"];
-    function datePickerDirective($compile, $document, $window, $timeout, $templateRequest, datePickerService) {
+    datepickerDirective.$inject = ["$compile", "$document", "$window", "$timeout", "$templateRequest", "datepickerService"];
+    function datepickerDirective($compile, $document, $window, $timeout, $templateRequest, datepickerService) {
 
         return {
             restrict: "A",
@@ -24,7 +24,7 @@
             var ctrl = ctrls[0]; //directive controller
             ctrl.textModelCtrl = ctrls[1]; // textbox model controller
 
-            datePickerService.addDirectiveCtrl(ctrl);
+            datepickerService.addDirectiveCtrl(ctrl);
 
             // execute the options expression in the parent scope
             var options = ctrl.options() || {};
@@ -56,7 +56,7 @@
                     // else append container to body                    
                 } else {
                     $document.find("body").append(ctrl.container);
-                    ctrl.container.addClass("date-picker-absolute-container");
+                    ctrl.container.addClass("datepicker-absolute-container");
                 }
 
                 // prevents text select on mouse drag, dblclick
@@ -120,12 +120,12 @@
 
             function _documentKeyDown(e) {
                 // hide inactive instances
-                datePickerService.hideIfInactive();
+                datepickerService.hideIfInactive();
             }
 
             function _documentClick(e) {
                 // hide inactive dropdowns
-                datePickerService.hideIfInactive();
+                datepickerService.hideIfInactive();
 
                 // we care about the active non-inline one only
                 if (ctrl.instanceId !== ctrl.activeInstanceId() || ctrl.isInline()) {
@@ -163,8 +163,8 @@
         }
     }
 
-    MainCtrl.$inject = ["$window", "$document", "datePickerService"];
-    function MainCtrl($window, $document, datePickerService) {
+    MainCtrl.$inject = ["$window", "$document", "datepickerService"];
+    function MainCtrl($window, $document, datepickerService) {
         var that = this;
 
         var activeInstanceId = 0,
@@ -434,7 +434,7 @@
             that.containerVisible = true;
 
             // callback
-            safeCallback(that.options.datePickerShown);
+            safeCallback(that.options.datepickerShown);
         }
 
         this.hide = function () {
@@ -451,7 +451,7 @@
             that.containerVisible = false;
 
             // callback
-            safeCallback(that.options.datePickerHidden);
+            safeCallback(that.options.datepickerHidden);
         }
 
 
@@ -874,12 +874,12 @@
         }
 
 
-        datePickerService.defaultOptionsDoc = function () {
+        datepickerService.defaultOptionsDoc = function () {
             return defaultOptionsDoc;
         }
     }
 
-    function datePickerService() {
+    function datepickerService() {
         var directiveCtrls = [];
 
         this.addDirectiveCtrl = function (ctrl) {
@@ -913,8 +913,8 @@
         dateOtherMonthCssClass: "date-other-month",
         dateDisabledCssClass: "date-disabled",
         //callback
-        datePickerShown: angular.noop,
-        datePickerHidden: angular.noop,
+        datepickerShown: angular.noop,
+        datepickerHidden: angular.noop,
         renderDate: angular.noop,
         beforeDateSelect: angular.noop,
         dateSelected: angular.noop,
