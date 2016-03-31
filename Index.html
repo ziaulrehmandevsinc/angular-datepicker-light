@@ -17,44 +17,22 @@
     <script type="text/javascript" src="javascripts/moment.js"></script>
     <script type="text/javascript" src="javascripts/angular-datepicker-light.js"></script>
     <script type="text/javascript" src="javascripts/scripts.js"></script>
-
-    <style type="text/css">
-        input[type=text].form-control {
-            width: 100px;
-        }
-
-        div.datepicker-container-inline {
-            margin-top: 3px;
-        }
-
-        div.date-target {
-            width: 320px;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 10px 10px 10px 10px;
-            text-align: center;
-            color: #191717;
-            background-color: rgb(255, 248, 182);
-        }
-    </style>
 </head>
 <body ng-app="mainApp">
     <div class="content">
 
         <h1 class="title">AngularJS datepicker-light plugin</h1>
         
-        <div style="font-size:20px">
-                    <div style="margin-top:20px">
-                        <code>npm install angular-datepicker-light</code>
-                    </div>
-<!--
-                    <div style="margin-top:5px">
-                        <code>bower install angular-datepicker-light</code>
-                    </div>
--->
-        </div>
-        
         <div class="container-fluid">
+            
+            <div class="row">
+                <div style="margin-top:20px">
+                    <code>npm install angular-datepicker-light</code>
+                </div>
+                <div style="margin-top:5px">
+                    <code>bower install angular-datepicker-light</code>
+                </div>
+            </div>
 
             <div class="row">
                 <div class="scenario">
@@ -86,8 +64,23 @@
 
             <div class="row">
                 <div class="scenario">
-                    <div ng-controller="InlineOtherMonthDatesCtrl as vm">
                         <h3>Example 3: Show Dates from Other Months</h3>
+                    <div ng-controller="InlineDisabledDatesCtrl as vm">
+                        <h3>Example 3: Disabled Dates</h3>
+                        <div>
+                            <input type="text"
+                                   ng-model="vm.date"
+                                   class="form-control"
+                                   angular-datepicker-light="vm.datepickerOptions" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="scenario">
+                    <div ng-controller="InlineOtherMonthDatesCtrl as vm">
+                        <h3>Example 4: Dates from Other Months</h3>
                         <div>
                             <input type="text"
                                    ng-model="vm.date"
@@ -101,7 +94,7 @@
             <div class="row">
                 <div class="scenario">
                     <div ng-controller="InlineCustomWeekStartCtrl as vm">
-                        <h3>Example 4: Custom Week Start</h3>
+                        <h3>Example 5: Custom Week Start</h3>
                         <div>
                             <input type="text"
                                    ng-model="vm.date"
@@ -112,24 +105,11 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="scenario">
-                    <div ng-controller="InlineDisabledDatesCtrl as vm">
-                        <h3>Example 5: Disabled Dates</h3>
-                        <div>
-                            <input type="text"
-                                   ng-model="vm.date"
-                                   class="form-control"
-                                   angular-datepicker-light="vm.datepickerOptions" />
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
 
             <div class="row">
                 <div class="scenario">
                     <div ng-controller="InlineDivTargetCtrl as vm">
-                        <h3>Example 6: &lt;Div&gt; Target Element</h3>
                         <div class="date-target" 
                              angular-datepicker-light="vm.datepickerOptions">
                             {{vm.date | date:'MM / dd / yyyy'}}

@@ -5,8 +5,8 @@
         .module('mainApp', ['datepickerModule'])
         .controller('OnFocusCtrl', OnFocusCtrl)
         .controller('InlineCtrl', InlineCtrl)
-        .controller('InlineOtherMonthDatesCtrl', InlineOtherMonthDatesCtrl)
         .controller('InlineDisabledDatesCtrl', InlineDisabledDatesCtrl)
+        .controller('InlineOtherMonthDatesCtrl', InlineOtherMonthDatesCtrl)
         .controller('InlineCustomWeekStartCtrl', InlineCustomWeekStartCtrl)
         .controller('InlineDivTargetCtrl', InlineDivTargetCtrl);
 
