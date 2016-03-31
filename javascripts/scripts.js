@@ -34,6 +34,31 @@
         };
     }
 
+    // inline, disabled dates, tooltip
+    function InlineDisabledDatesCtrl() {
+        var vm = this;
+
+        vm.date = dateText;
+
+        vm.datepickerOptions = {
+            inline: true,
+            containerCssClass: "datepicker-container-inline",
+            renderDate: function (e) {
+                var date = e.date.getDate();
+
+                var enable = (date < 5 || date > 20);
+                return {
+                    enabled: enable,
+                    tooltip: enable ? null : "We are closed!"
+                }
+            },
+            beforeDateSelect: function (e) {
+                var date = e.date.getDate();
+                return { cancel: date === 30 };
+            }
+        };
+    }
+
     // inline, other month dates
     function InlineOtherMonthDatesCtrl() {
         var vm = this;
@@ -57,31 +82,6 @@
             inline: true,
             firstDayOfWeek: 1,
             containerCssClass: "datepicker-container-inline"
-        };
-    }
-
-    // inline, disabled dates, tooltip
-    function InlineDisabledDatesCtrl() {
-        var vm = this;
-
-        vm.date = dateText;
-
-        vm.datepickerOptions = {
-            inline: true,
-            containerCssClass: "datepicker-container-inline",
-            renderDate: function (e) {
-                var date = e.date.getDate();
-
-                var enable = (date < 5 || date > 20);
-                return {
-                    enabled: enable,
-                    tooltip: enable ? null : "We are closed!"
-                }
-            },
-            beforeDateSelect: function (e) {
-                var date = e.date.getDate();
-                return { cancel: date === 30 };
-            }
         };
     }
 

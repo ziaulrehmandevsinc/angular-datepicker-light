@@ -147,7 +147,7 @@
                 // hide the active calendar if user clicks anywhere away from the dropdown list
                 var offset = ctrl.container[0].getBoundingClientRect();
                 var isMouseAwayFromActiveContainer = false;
-                var awayTolerance = 100;
+                var awayTolerance = 50;
 
                 //check if mouse is over the container
                 if (e.pageX < offset.left - awayTolerance

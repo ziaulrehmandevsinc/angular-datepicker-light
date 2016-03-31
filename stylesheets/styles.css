@@ -39,10 +39,10 @@ div.scenario {
 }
 
     div.scenario input[type=text] {
+        display: inline-block;
+        width: 110px;
         font-weight: bold;
         background-color: rgb(255, 248, 182);
-        display: inline-block;
-        width: 100px;
     }
 
 
@@ -58,4 +58,9 @@ div.date-target {
     text-align: center;
     color: #191717;
     background-color: rgb(255, 248, 182);
+}
+
+#calendarIcon {
+    font-size: 25px;
+    margin-left: 5px;
 }
