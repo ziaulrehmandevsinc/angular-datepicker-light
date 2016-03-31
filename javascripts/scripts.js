@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('mainApp', ['datepickerModule'])
+        .module('mainApp', ['datepickerLightModule'])
         .controller('OnFocusCtrl', OnFocusCtrl)
         .controller('InlineCtrl', InlineCtrl)
         .controller('InlineDisabledDatesCtrl', InlineDisabledDatesCtrl)
@@ -18,6 +18,9 @@
     function OnFocusCtrl() {
         var vm = this;
         vm.date = dateText;
+        vm.datepickerOptions = {
+            altTarget: $("#calendarIcon")
+        };
     }
 
     // inline

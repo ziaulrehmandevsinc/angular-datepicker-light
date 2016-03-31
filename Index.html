@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -22,9 +22,9 @@
     <div class="content">
 
         <h1 class="title">AngularJS datepicker-light plugin</h1>
-        
+
         <div class="container-fluid">
-            
+
             <div class="row">
                 <div style="margin-top:20px">
                     <code>npm install angular-datepicker-light</code>
@@ -42,7 +42,7 @@
                             <input type="text"
                                    ng-model="vm.date"
                                    class="form-control"
-                                   angular-datepicker-light/>
+                                   angular-datepicker-light="vm.datepickerOptions" /> <span id="calendarIcon" style="font-size: 25px;" class="fa fa-calendar"></span>
                         </div>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="scenario">
                     <div ng-controller="InlineOtherMonthDatesCtrl as vm">
@@ -104,13 +104,11 @@
                 </div>
             </div>
 
-            
-
             <div class="row">
                 <div class="scenario">
                     <div ng-controller="InlineDivTargetCtrl as vm">
                         <h3>Example 6: &lt;div&gt;&lt;/div&gt; Target</h3>
-                        <div class="date-target" 
+                        <div class="date-target"
                              angular-datepicker-light="vm.datepickerOptions">
                             {{vm.date | date:'MM / dd / yyyy'}}
                         </div>

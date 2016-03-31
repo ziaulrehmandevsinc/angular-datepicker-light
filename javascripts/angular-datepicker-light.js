@@ -1,21 +1,21 @@
 (function () {
     angular
-        .module('datepickerModule', [])
-        .service('datepickerService', datepickerService)
-        .directive('angularDatepicker', datepickerDirective);
+        .module('datepickerLightModule', [])
+        .service('datepickerLightService', datepickerLightService)
+        .directive('angularDatepickerLight', datepickerLightDirective);
 
-    datepickerDirective.$inject = ["$compile", "$document", "$window", "$timeout", "$templateRequest", "datepickerService"];
-    function datepickerDirective($compile, $document, $window, $timeout, $templateRequest, datepickerService) {
+    datepickerLightDirective.$inject = ["$compile", "$document", "$window", "$timeout", "$templateRequest", "datepickerLightService"];
+    function datepickerLightDirective($compile, $document, $window, $timeout, $templateRequest, datepickerLightService) {
 
         return {
             restrict: "A",
             scope: {
-                options: '&angularDatepicker'
+                options: '&angularDatepickerLight'
             },
             transclude: false,
             controllerAs: "ctrl",
             bindToController: true,
-            require: ["angularDatepicker", "?ngModel"],
+            require: ["angularDatepickerLight", "?ngModel"],
             link: postLinkFn,
             controller: MainCtrl
         }
@@ -24,7 +24,7 @@
             var ctrl = ctrls[0]; //directive controller
             ctrl.textModelCtrl = ctrls[1]; // textbox model controller
 
-            datepickerService.addDirectiveCtrl(ctrl);
+            datepickerLightService.addDirectiveCtrl(ctrl);
 
             // execute the options expression in the parent scope
             var options = ctrl.options() || {};
@@ -59,6 +59,17 @@
                     ctrl.container.addClass("datepicker-absolute-container");
                 }
 
+                // if a jquery altTarget is specified in options append the container
+                // altTarget supported only for non-inline
+                if (!ctrl.isInline() && angular.isElement(ctrl.options.altTarget)) {
+                    // focus the textbox when the alt target(ex: image icon) is clicked
+                    ctrl.options.altTarget.on("click focus", function (e) {
+                        scope.$evalAsync(function () {
+                            ctrl.activate();
+                        });
+                    });
+                }
+
                 // prevents text select on mouse drag, dblclick
                 ctrl.container.css("MozUserSelect", "none").bind("selectstart", function () {
                     return false;
@@ -70,8 +81,8 @@
                 }
             }
 
-            // when the target(textbox) gets focus activate the corresponding container
-            element.on("focus", function (e) {
+            // when the target(textbox) is clicked focus activate the corresponding container
+            element.on("click focus", function (e) {
                 scope.$evalAsync(function () {
                     ctrl.activate();
                 });
@@ -99,6 +110,7 @@
                 });
             });
 
+            // hide on-focus calendar on window resize
             angular.element($window).on("resize", function (e) {
                 scope.$evalAsync(function () {
                     ctrl.hide();
@@ -120,12 +132,12 @@
 
             function _documentKeyDown(e) {
                 // hide inactive instances
-                datepickerService.hideIfInactive();
+                datepickerLightService.hideIfInactive();
             }
 
             function _documentClick(e) {
                 // hide inactive dropdowns
-                datepickerService.hideIfInactive();
+                datepickerLightService.hideIfInactive();
 
                 // we care about the active non-inline one only
                 if (ctrl.instanceId !== ctrl.activeInstanceId() || ctrl.isInline()) {
@@ -155,6 +167,18 @@
                         isMouseAwayFromActiveContainer = false;
                     }
 
+                    //check if mouse is over the alt target (ex:image icon)
+                    if (angular.isElement(ctrl.options.altTarget)) {
+                        offset = ctrl.options.altTarget[0].getBoundingClientRect();
+                        if (e.pageX >= offset.left
+                            && e.pageX <= offset.left + offset.width
+                            && e.pageY >= offset.top
+                            && e.pageY <= offset.top + offset.height) {
+
+                            isMouseAwayFromActiveContainer = false;
+                        }
+                    }
+
                     if (isMouseAwayFromActiveContainer === true) {
                         ctrl.hide();
                     }
@@ -163,8 +187,8 @@
         }
     }
 
-    MainCtrl.$inject = ["$window", "$document", "datepickerService"];
-    function MainCtrl($window, $document, datepickerService) {
+    MainCtrl.$inject = ["$window", "$document", "datepickerLightService"];
+    function MainCtrl($window, $document, datepickerLightService) {
         var that = this;
 
         var activeInstanceId = 0,
@@ -371,10 +395,10 @@
 
             var dateVisible = that.isDateVisible(cellData.date);
 
-            css[that.options.dateVisibleCssClass] = dateVisible;
-            css[that.options.dateOtherMonthCssClass] = dateVisible && that.isOtherMonth(cellData.date);
-            css[that.options.dateSelectedCssClass] = dateVisible && that.isDateSelected(cellData.date);
-            css[that.options.dateDisabledCssClass] = dateVisible && (cellData.enabled === false);
+            css["date-visible"] = dateVisible;
+            css["date-other-month"] = dateVisible && that.isOtherMonth(cellData.date);
+            css["date-selected"] = dateVisible && that.isDateSelected(cellData.date);
+            css["date-disabled"] = dateVisible && (cellData.enabled === false);
 
             // custom css class added in callback
             if (!isUndefinedOrNull(cellData.cssClass)) {
@@ -874,12 +898,12 @@
         }
 
 
-        datepickerService.defaultOptionsDoc = function () {
+        datepickerLightService.defaultOptionsDoc = function () {
             return defaultOptionsDoc;
         }
     }
 
-    function datepickerService() {
+    function datepickerLightService() {
         var directiveCtrls = [];
 
         this.addDirectiveCtrl = function (ctrl) {
@@ -906,13 +930,7 @@
         maxDate: null,
         firstDayOfWeek: 0,
         showOtherMonthDates: false,
-        //css class
-        containerCssClass: undefined,
-        dateVisibleCssClass: "date-visible",
-        dateSelectedCssClass: "date-selected",
-        dateOtherMonthCssClass: "date-other-month",
-        dateDisabledCssClass: "date-disabled",
-        //callback
+        containerCssClass: null,
         datepickerShown: angular.noop,
         datepickerHidden: angular.noop,
         renderDate: angular.noop,
