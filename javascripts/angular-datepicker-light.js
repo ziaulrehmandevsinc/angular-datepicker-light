@@ -81,7 +81,7 @@
                 }
             }
 
-            // when the target(textbox) is clicked focus activate the corresponding container
+            // when the target(textbox) gets focus activate the corresponding container
             element.on("click focus", function (e) {
                 scope.$evalAsync(function () {
                     ctrl.activate();
@@ -110,7 +110,6 @@
                 });
             });
 
-            // hide on-focus calendar on window resize
             angular.element($window).on("resize", function (e) {
                 scope.$evalAsync(function () {
                     ctrl.hide();
@@ -246,25 +245,20 @@
             var now = new Date();
 
             // set min and max date values
-            // if not provided in options default minDate to 1/1 and maxDate to 12/31 of next year
+            // if not provided in options default minDate to 1/1/(-5 years) and maxDate to 12/31/(+5 years) of next year
             if (isUndefinedOrNull(that.options.minDate)) {
-                minDate = null
+                minDate = new Date(now.getFullYear() - 5, 0, 1);
             }
             else {
                 minDate = parseDate(that.options.minDate);
             }
-            if (minDate == null) {
-                minDate = new Date(now.getFullYear(), 0, 1);
-            }
+
             // maxdate
             if (isUndefinedOrNull(that.options.maxDate)) {
-                maxDate = null
+                maxDate = new Date(now.getFullYear() + 5, 11, 31);
             }
             else {
                 maxDate = parseDate(that.options.maxDate);
-            }
-            if (maxDate == null) {
-                maxDate = new Date(now.getFullYear() + 1, 11, 31);
             }
 
             // create day names array starting at options.firstDayOfWeek
@@ -680,10 +674,13 @@
                 }
 
                 // callback for each date
-                var cbRetVal = safeCallback(that.options.renderDate, { date: cellData.date });
+                var cbRetVal = safeCallback(that.options.renderDate, {
+                    date: cellData.date
+                });
 
                 // pass an empty literal in case nothing was returned from callback
-                copySupportedProperties(cbRetVal || {}, cellData);
+                copySupportedProperties(cbRetVal || {
+                }, cellData);
             });
         }
 
@@ -776,7 +773,10 @@
                 return;
             }
 
-            var cbRetVal = safeCallback(that.options.beforeDateSelect, { date: cellData.date, cancel: false, data: cellData.data });
+            var cbRetVal = safeCallback(that.options.beforeDateSelect, {
+                date: cellData.date,
+                data: cellData.data
+            });
 
             // cancel selection if set to true from callback
             if (!isUndefinedOrNull(cbRetVal) && cbRetVal.cancel === true) {
@@ -791,7 +791,10 @@
                 updateTargetModel(formatDate(that.selectedData.date));
             }
 
-            safeCallback(that.options.dateSelected, { date: cellData.date, data: cellData.data });
+            safeCallback(that.options.dateSelected, {
+                date: cellData.date,
+                data: cellData.data
+            });
         }
 
 
@@ -931,71 +934,72 @@
         firstDayOfWeek: 0,
         showOtherMonthDates: false,
         containerCssClass: null,
+        monthYearChanged: angular.noop,
         datepickerShown: angular.noop,
         datepickerHidden: angular.noop,
         renderDate: angular.noop,
         beforeDateSelect: angular.noop,
-        dateSelected: angular.noop,
-        monthYearChanged: angular.noop
+        dateSelected: angular.noop
     };
 
     var defaultOptionsDoc = {
+        altTarget: {
+            def: "null",
+            doc: "Normally this is the calendar icon jQuery element associated with the datepicker."
+        },
+        inline: {
+            def: "false",
+            doc: "If set to true displays the calendar inline below the target. Alternatively, set to a jQuery element to append the calendar."
+        },
+        dateFormat: {
+            def: "MM/DD/YYYY",
+            doc: "The date format used to parse and display dates. For a full list of the possible formats see the <a href='http://momentjs.com/docs/#/displaying/format/'><u>momentjs documentation</u></a>"
+        },
+        minDate: {
+            def: "null",
+            doc: "The minimum selectable date. If set to null defaults to 01/01 and five years in the past."
+        },
+        maxDate: {
+            def: "null",
+            doc: "The maximum selectable date. If set to null defaults to 12/31 and five years in the future."
+        },
+        firstDayOfWeek: {
+            def: "0",
+            doc: "The first day of the week. 0 is Sunday, 1 is Monday and so forth."
+        },
+        showOtherMonthDates: {
+            def: "false",
+            doc: "Display dates from other months at the start or end of the current month."
+        },
         containerCssClass: {
-            def: "undefined",
-            doc: "CSS class applied to the dropdown container"
+            def: "null",
+            doc: "CSS class applied to the datepicker container"
         },
-        dateSelectedCssClass: {
-            def: "date-selected",
-            doc: "CSS class applied to the selected date cell"
-        },
-        minimumChars: {
-            def: "1",
-            doc: "Minimum number of characters required to display the dropdown."
-        },
-        maxItemsToRender: {
-            def: "20",
-            doc: "Maximum number of items to render in the list."
-        },
-        dropdownWidth: {
-            def: "auto",
-            doc: "Width in 'px' of the dropddown list."
-        },
-        dropdownHeight: {
-            def: "auto",
-            doc: "Height in 'px' of the dropddown list."
-        },
-        dropdownParent: {
-            def: "undefined",
-            doc: "a jQuery object to append the dropddown list."
-        },
-        loading: {
+        monthYearChanged: {
             def: "noop",
-            doc: "Callback before getting the data for the dropdown."
+            doc: "Callback when either the selected month or year changes. The function receives an object with the selected 'month' and 'year' as properties."
         },
-        data: {
+        datepickerShown: {
             def: "noop",
-            doc: "Callback for data for the dropdown. Must return a promise"
+            doc: "Callback when the datepicker is shown."
         },
-        loadingComplete: {
+        datepickerHidden: {
             def: "noop",
-            doc: "Callback after the items are rendered in the dropdown."
+            doc: "Callback when the datepicker is hidden."
         },
-        renderItem: {
+        renderDate: {
             def: "noop",
-            doc: "Callback for custom rendering a list item. This is called for each item in the dropdown. It must return an object literal with 'value' and 'label' properties, where label is the safe html for display and value is the text for the textbox"
+            doc: "Callback when the calendar is being rendered. This is called for each date in the calendar. \
+                    The function receives an object with 'date' as parameter. \
+                    Return a object with 'cssClass', 'enabled':(true/false)', 'selected:(true/false)', 'tooltip' and 'data' to store any arbitrary data on the date cell."
         },
-        itemSelected: {
+        beforeDateSelect: {
             def: "noop",
-            doc: "Callback after an item is selected from the dropdown."
+            doc: "Callback before a date is about to be selected. The function receives an object with 'date' and 'data' properties. To prevent selecting the date return an object with 'cancel' set to true."
         },
-        dropdownShown: {
+        dateSelected: {
             def: "noop",
-            doc: "Callback after the dropdown is hidden."
-        },
-        dropdownHidden: {
-            def: "noop",
-            doc: "Callback after the dropdown is shown."
+            doc: "Callback after a date is selected. The function receives an object with 'date' and 'data' properties."
         }
     };
-
 })();
