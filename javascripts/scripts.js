@@ -10,9 +10,7 @@
         .controller('InlineCustomWeekStartCtrl', InlineCustomWeekStartCtrl)
         .controller('InlineDivTargetCtrl', InlineDivTargetCtrl);
 
-    var today = new Date();
-    var mom = moment(today);
-    var dateText = mom.format("MM/DD/YYYY");
+    var dateText = moment(new Date()).format("MM/DD/YYYY");
 
     // on focus
     function OnFocusCtrl() {
