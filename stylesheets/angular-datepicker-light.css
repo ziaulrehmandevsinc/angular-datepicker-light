@@ -21,8 +21,14 @@ div.datepicker-container > div.top-panel {
     div.datepicker-container > div.top-panel > table.calendar {
         width: 100%;
         white-space: nowrap;
+        margin: 0px;
     }
 
+    div.datepicker-container > div.top-panel > table.calendar > tbody > tr > td {
+        background-color: transparent;
+        border: 0px;
+    }
+    
     div.datepicker-container > div.top-panel a.prev,
     div.datepicker-container > div.top-panel a.next {
         display: inline-block;
@@ -45,6 +51,7 @@ div.datepicker-container > div.top-panel {
 
 div.datepicker-container > div.middle-panel > table.calendar {
     width: 100%;
+    margin: 0px;
     border-collapse: collapse;
 }
 
@@ -55,6 +62,10 @@ div.datepicker-container > div.middle-panel > table.calendar {
         padding: 8px;
         color: Black;
         text-align: center;
+    }
+
+    div.datepicker-container > div.middle-panel > table.calendar > tbody > tr > td {
+        background-color: transparent;
     }
 
     div.datepicker-container > div.middle-panel > table.calendar > tbody > tr.week-row > td,
@@ -93,8 +104,17 @@ div.datepicker-container > div.bottom-panel {
     padding: 10px 0px;
 }
 
+    div.datepicker-container > div.bottom-panel > table.calendar {
+        margin: 0px;
+        background-color: transparent;
+        padding: 4px 8px;
+    }
+
+
     div.datepicker-container > div.bottom-panel > table.calendar > tbody > tr > td {
         padding: 4px 8px;
+        background-color: transparent;
+        border: 0px;
     }
 
     div.datepicker-container > div.bottom-panel a.today {
@@ -105,29 +125,26 @@ div.datepicker-container > div.bottom-panel {
 
 
 @font-face {
-  font-family: 'FontAwesome';
-  src: url('font-awesome/fonts/fontawesome-webfont.eot?v=4.5.0');
-  src: url('font-awesome/fonts/fontawesome-webfont.eot?#iefix&v=4.5.0') format('embedded-opentype'), 
-       url('font-awesome/fonts/fontawesome-webfont.woff2?v=4.5.0') format('woff2'), 
-       url('font-awesome/fonts/fontawesome-webfont.woff?v=4.5.0') format('woff'), 
-       url('font-awesome/fonts/fontawesome-webfont.ttf?v=4.5.0') format('truetype'), 
-       url('font-awesome/fonts/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular') format('svg');
-  font-weight: normal;
-  font-style: normal;
+    font-family: 'FontAwesome';
+    src: url('font-awesome/fonts/fontawesome-webfont.eot?v=4.5.0');
+    src: url('font-awesome/fonts/fontawesome-webfont.eot?#iefix&v=4.5.0') format('embedded-opentype'), url('font-awesome/fonts/fontawesome-webfont.woff2?v=4.5.0') format('woff2'), url('font-awesome/fonts/fontawesome-webfont.woff?v=4.5.0') format('woff'), url('font-awesome/fonts/fontawesome-webfont.ttf?v=4.5.0') format('truetype'), url('font-awesome/fonts/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
 
 .fa {
-  display: inline-block;
-  font: normal normal normal 14px/1 FontAwesome;
-  font-size: inherit;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .fa-chevron-left:before {
-  content: "\f053";
+    content: "\f053";
 }
+
 .fa-chevron-right:before {
-  content: "\f054";
+    content: "\f054";
 }
