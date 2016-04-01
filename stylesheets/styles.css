@@ -47,7 +47,7 @@ div.scenario {
 
 
 div.datepicker-container-inline {
-    margin-top: 3px;
+    margin-top: 5px;
 }
 
 div.date-target {
@@ -61,6 +61,11 @@ div.date-target {
 }
 
 #calendarIcon {
-    font-size: 25px;
     margin-left: 5px;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-position: top left;
+    background-image: url(images/calendar.png);
 }
