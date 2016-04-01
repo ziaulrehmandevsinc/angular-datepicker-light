@@ -86,7 +86,7 @@
     function InlineDivTargetCtrl() {
         var vm = this;
 
-        vm.date = today;
+        vm.date = new Date();
 
         vm.datepickerOptions = {
             inline: true,
